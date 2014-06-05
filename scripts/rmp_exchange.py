@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import roslib 
-roslib.load_manifest('segway_rmp')
+roslib.load_manifest('ros_ethernet_rmp')
 import rospy
 
 """--------------------------------------------------------------------
@@ -52,6 +52,7 @@ from python_ethernet_rmp.rmp_interface import RMP
 from python_ethernet_rmp.system_defines import *
 from python_ethernet_rmp.user_event_handlers import RMPEventHandlers
 from python_ethernet_rmp.rmp_config_params import *
+from geometry_msgs.msg import Twist
 import sys,time,threading,Queue
 
 """
@@ -158,9 +159,12 @@ class RMPExchange:
 		#sys.exit()
 		print 'exited rmp_exchagne'
 				
-	def sendCommand(self,command):
-		#make into RMP command format
-		self.EventHandler.AddCommand(command)
+	def sendMotionCommand(self,command):
+		self.EventHandler.AddCommand([RMP_MOTION_CMD_ID,command.linear,command.angular])
+	
+	def sendRMPCommand(self,command):
+		#TODO: add checks for various types of Commands 
+		self.EventHandler.AddCommand([command.cmd_id, command.arg1, command.arg2])
 		
 	def publishFeedback(self,fb_dict):
 		snrValues = []
@@ -202,7 +206,8 @@ class RMPExchange:
 		Initialize the ROS node
 		"""
 		rospy.init_node('rmp_exchange')
-		rospy.Subscriber("rmp_command", rmpCommand, self.sendCommand)
+		rospy.Subscriber("rmp_command", rmpCommand, self.sendRMPCommand)
+		rospy.Subscriber("cmd_vel", Twist, self.sendMotionCommand)
 		print "RMP exchange node started."
 		
 		self.EventHandler.AddListener(self.publishFeedback)
