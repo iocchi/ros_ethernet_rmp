@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import roslib 
 roslib.load_manifest('ros_ethernet_rmp')
+roslib.load_manifest('python_ethernet_rmp')
 import rospy
 
 """--------------------------------------------------------------------
@@ -90,25 +91,25 @@ class RMPExchange:
 		Read in the Ros Params and add them to a array to set the config params
 		"""
 		params = []
-		params.append(['my_velocity_limit_mps',rospy.get_param('~my_velocity_limit_mps ',0.5)])
-		params.append(['my_accel_limit_mps2',rospy.get_param('~my_accel_limit_mps2 ',0.981)])
-		params.append(['my_decel_limit_mps2',rospy.get_param('~my_decel_limit_mps2 ',0.981)])
-		params.append(['my_coastdown_accel_mps2',rospy.get_param('~my_coastdown_accel_mps2 ',0.1962)])
-		params.append(['my_yaw_rate_limit_rps',rospy.get_param('~my_yaw_rate_limit_rps ',0.5)])
-		params.append(['my_yaw_accel_limit_rps2',rospy.get_param('~my_yaw_accel_limit_rps2 ',0.5)])
-		params.append(['my_tire_diameter_m',rospy.get_param('~my_tire_diameter_m ',I2_TIRE_DIAMETER_M)])
-		params.append(['my_wheel_base_length_m',rospy.get_param('~my_wheel_base_length_m ',DEFAULT_WHEEL_BASE_LENGTH_M)])
-		params.append(['my_wheel_track_width_m',rospy.get_param('~my_wheel_track_width_m ',I2_WHEEL_TRACK_WIDTH_M)])
-		params.append(['my_gear_ratio',rospy.get_param('~my_gear_ratio ',I2_TRANSMISSION_RATIO)])
+		params.append(['my_velocity_limit_mps',rospy.get_param('~my_velocity_limit_mps ',1)])
+		params.append(['my_accel_limit_mps2',rospy.get_param('~my_accel_limit_mps2 ',1)])
+		params.append(['my_decel_limit_mps2',rospy.get_param('~my_decel_limit_mps2 ',1)])
+		params.append(['my_coastdown_accel_mps2',rospy.get_param('~my_coastdown_accel_mps2 ',1)])
+		params.append(['my_yaw_rate_limit_rps',rospy.get_param('~my_yaw_rate_limit_rps ',1)])
+		params.append(['my_yaw_accel_limit_rps2',rospy.get_param('~my_yaw_accel_limit_rps2 ',1)])
+		params.append(['my_tire_diameter_m',rospy.get_param('~my_tire_diameter_m ',1)])
+		params.append(['my_wheel_base_length_m',rospy.get_param('~my_wheel_base_length_m ',1)])
+		params.append(['my_wheel_track_width_m',rospy.get_param('~my_wheel_track_width_m ',1)])
+		params.append(['my_gear_ratio',rospy.get_param('~my_gear_ratio ',1)])
 		params.append(['my_config_bitmap',rospy.get_param('~my_config_bitmap ',1)])
-		params.append(['my_ip_address',rospy.get_param('~my_ip_address ',DEFAULT_IP_ADDRESS)])
-		params.append(['my_port_num',rospy.get_param('~my_port_num ',DEFAULT_PORT_NUMBER)])
-		params.append(['my_subnet_mask',rospy.get_param('~my_subnet_mask ',DEFAULT_SUBNET_MASK)])
-		params.append(['my_gateway',rospy.get_param('~my_gateway ',DEFAULT_GATEWAY)])
-		params.append(['my_user_defined_feedback_bitmap_1',rospy.get_param('~my_user_defined_feedback_bitmap_1 ',DEFAULT_USER_FB_1_BITMAP)])
-		params.append(['my_user_defined_feedback_bitmap_2',rospy.get_param('~my_user_defined_feedback_bitmap_2 ',DEFAULT_USER_FB_2_BITMAP)])
-		params.append(['my_user_defined_feedback_bitmap_3',rospy.get_param('~my_user_defined_feedback_bitmap_3 ',DEFAULT_USER_FB_3_BITMAP)])
-		params.append(['my_user_defined_feedback_bitmap_4',rospy.get_param('~my_user_defined_feedback_bitmap_4 ',DEFAULT_USER_FB_4_BITMAP)])
+		params.append(['my_ip_address',rospy.get_param('~my_ip_address ',1)])
+		params.append(['my_port_num',rospy.get_param('~my_port_num ',1)])
+		params.append(['my_subnet_mask',rospy.get_param('~my_subnet_mask ',1)])
+		params.append(['my_gateway',rospy.get_param('~my_gateway ',1)])
+		params.append(['my_user_defined_feedback_bitmap_1',rospy.get_param('~my_user_defined_feedback_bitmap_1 ',1)])
+		params.append(['my_user_defined_feedback_bitmap_2',rospy.get_param('~my_user_defined_feedback_bitmap_2 ',1)])
+		params.append(['my_user_defined_feedback_bitmap_3',rospy.get_param('~my_user_defined_feedback_bitmap_3 ',1)])
+		params.append(['my_user_defined_feedback_bitmap_4',rospy.get_param('~my_user_defined_feedback_bitmap_4 ',1)])
 		
 		SetRMPConfigParams(params)
 				
@@ -139,7 +140,7 @@ class RMPExchange:
 		Initialize the feedback publisher
 		"""
 		self.rmpFeedback = rmpFeedback()
-		self.feedbackPub = rospy.Publisher('rmp_feedback', rmpFeedback)
+		self.feedbackPub = rospy.Publisher('rmp_feedback', rmpFeedback, False, None, None)
 		
 	def __del__(self):
 		"""
