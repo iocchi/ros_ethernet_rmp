@@ -47,7 +47,6 @@ arising out of or based upon:
  IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
  CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
 --------------------------------------------------------------------"""
-
 from ros_ethernet_rmp.msg import rmpCommand, rmpFeedback
 from python_ethernet_rmp.rmp_interface import RMP
 from python_ethernet_rmp.system_defines import *
@@ -87,32 +86,58 @@ class RMPExchange:
 		"""
 		Initialze the thread 
 		"""
+				
 		"""
 		Read in the Ros Params and add them to a array to set the config params
 		"""
-		params = []
-		params.append(['my_velocity_limit_mps',rospy.get_param('~my_velocity_limit_mps ',1)])
-		params.append(['my_accel_limit_mps2',rospy.get_param('~my_accel_limit_mps2 ',1)])
-		params.append(['my_decel_limit_mps2',rospy.get_param('~my_decel_limit_mps2 ',1)])
-		params.append(['my_coastdown_accel_mps2',rospy.get_param('~my_coastdown_accel_mps2 ',1)])
-		params.append(['my_yaw_rate_limit_rps',rospy.get_param('~my_yaw_rate_limit_rps ',1)])
-		params.append(['my_yaw_accel_limit_rps2',rospy.get_param('~my_yaw_accel_limit_rps2 ',1)])
-		params.append(['my_tire_diameter_m',rospy.get_param('~my_tire_diameter_m ',1)])
-		params.append(['my_wheel_base_length_m',rospy.get_param('~my_wheel_base_length_m ',1)])
-		params.append(['my_wheel_track_width_m',rospy.get_param('~my_wheel_track_width_m ',1)])
-		params.append(['my_gear_ratio',rospy.get_param('~my_gear_ratio ',1)])
-		params.append(['my_config_bitmap',rospy.get_param('~my_config_bitmap ',1)])
-		params.append(['my_ip_address',rospy.get_param('~my_ip_address ',1)])
-		params.append(['my_port_num',rospy.get_param('~my_port_num ',1)])
-		params.append(['my_subnet_mask',rospy.get_param('~my_subnet_mask ',1)])
-		params.append(['my_gateway',rospy.get_param('~my_gateway ',1)])
-		params.append(['my_user_defined_feedback_bitmap_1',rospy.get_param('~my_user_defined_feedback_bitmap_1 ',1)])
-		params.append(['my_user_defined_feedback_bitmap_2',rospy.get_param('~my_user_defined_feedback_bitmap_2 ',1)])
-		params.append(['my_user_defined_feedback_bitmap_3',rospy.get_param('~my_user_defined_feedback_bitmap_3 ',1)])
-		params.append(['my_user_defined_feedback_bitmap_4',rospy.get_param('~my_user_defined_feedback_bitmap_4 ',1)])
+		global UPDATE_DELAY_SEC, LOG_DATA, rmp_addr 
+		update_time = rospy.get_param('/update_delay_sec',0.05)
+		LOG_DATA = rospy.get_param('~log_data',False)
+		ip_addr = rospy.get_param('~current_rmp_ip_addr',DEFAULT_IP_ADDRESS)
+		port_num = rospy.get_param('~current_rmp_port_num',DEFAULT_PORT_NUMBER)
+		self.isOmni = rospy.get_param('~is_omni ',False)
+		try:
+			dottedQuadToNum(ip_addr)
+			if port_num > 0:
+				rmp_addr = (ip_addr,port_num)
+			else:
+				rospy.logwarn("current_rmp_port_num is not a valid port number")	
+		except:
+			rospy.logwarn("current_rmp_ip_addr in not in dotted quad format")
 		
-		SetRMPConfigParams(params)
-				
+		
+		if update_time >= 0.01:
+			UPDATE_DELAY_SEC = update_time
+		else:
+			rospy.logwarn("Update delay time is too fast, set to 0.01 seconds")
+			UPDATE_DELAY_SEC = 0.01
+		print "\n"
+		print rospy.get_param_names()
+		print "\n"
+		if rospy.has_param('/rmp_exchange/my_velocity_limit_mps'):	
+			print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+		self.rmpParams = []
+		self.rmpParams.append([RMP_CMD_SET_MAXIMUM_VELOCITY,rospy.get_param('~my_velocity_limit_mps',DEFAULT_MAXIMUM_VELOCITY_MPS)])
+		self.rmpParams.append([RMP_CMD_SET_MAXIMUM_ACCELERATION,rospy.get_param('~my_accel_limit_mps2',DEFAULT_MAXIMUM_ACCELERATION_MPS2)])
+		self.rmpParams.append([RMP_CMD_SET_MAXIMUM_DECELERATION,rospy.get_param('~my_decel_limit_mps2',DEFAULT_MAXIMUM_DECELERATION_MPS2)])
+		self.rmpParams.append([RMP_CMD_SET_MAXIMUM_DTZ_DECEL_RATE,rospy.get_param('~my_dtz_rate_mps2',DEFAULT_MAXIMUM_DTZ_DECEL_RATE_MPS2)])
+		self.rmpParams.append([RMP_CMD_SET_COASTDOWN_ACCEL,rospy.get_param('~my_coastdown_accel_mps2',DEFAULT_COASTDOWN_ACCEL_MPS2)])
+		self.rmpParams.append([RMP_CMD_SET_MAXIMUM_TURN_RATE,rospy.get_param('~my_yaw_rate_limit_rps',DEFAULT_MAXIMUM_YAW_RATE_RPS)])
+		self.rmpParams.append([RMP_CMD_SET_MAXIMUM_TURN_ACCEL,rospy.get_param('~my_yaw_accel_limit_rps2',DEFAULT_MAX_YAW_ACCEL_RPS2)])
+		self.rmpParams.append([RMP_CMD_SET_TIRE_DIAMETER,rospy.get_param('~my_tire_diameter_m',DEFAULT_TIRE_DIAMETER_M)])
+		self.rmpParams.append([RMP_CMD_SET_WHEEL_BASE_LENGTH,rospy.get_param('~my_wheel_base_length_m',DEFAULT_WHEEL_BASE_LENGTH_M)])
+		self.rmpParams.append([RMP_CMD_SET_WHEEL_TRACK_WIDTH,rospy.get_param('~my_wheel_track_width_m',DEFAULT_WHEEL_TRACK_WIDTH_M)])
+		self.rmpParams.append([RMP_CMD_SET_TRANSMISSION_RATIO,rospy.get_param('~my_gear_ratio',DEFAULT_TRANSMISSION_RATIO)])
+		self.rmpParams.append([RMP_CMD_SET_INPUT_CONFIG_BITMAP,rospy.get_param('~my_config_bitmap',DEFAULT_CONFIG_BITMAP)])
+		self.rmpParams.append([RMP_CMD_SET_ETH_IP_ADDRESS,rospy.get_param('~my_ip_address',DEFAULT_IP_ADDRESS)])
+		self.rmpParams.append([RMP_CMD_SET_ETH_PORT_NUMBER,rospy.get_param('~my_port_num',DEFAULT_PORT_NUMBER)])
+		self.rmpParams.append([RMP_CMD_SET_ETH_SUBNET_MASK,rospy.get_param('~my_subnet_mask',DEFAULT_SUBNET_MASK)])
+		self.rmpParams.append([RMP_CMD_SET_ETH_GATEWAY,rospy.get_param('~my_gateway',DEFAULT_GATEWAY)])
+		self.rmpParams.append([RMP_CMD_SET_USER_FB_1_BITMAP,rospy.get_param('~my_user_defined_feedback_bitmap_1',DEFAULT_USER_FB_1_BITMAP)])
+		self.rmpParams.append([RMP_CMD_SET_USER_FB_2_BITMAP,rospy.get_param('~my_user_defined_feedback_bitmap_2',DEFAULT_USER_FB_1_BITMAP)])
+		self.rmpParams.append([RMP_CMD_SET_USER_FB_3_BITMAP,rospy.get_param('~my_user_defined_feedback_bitmap_3',DEFAULT_USER_FB_1_BITMAP)])
+		self.rmpParams.append([RMP_CMD_SET_USER_FB_4_BITMAP,rospy.get_param('~my_user_defined_feedback_bitmap_4',DEFAULT_USER_FB_1_BITMAP)])
+						
 		"""
 		Create and response and command queue. The responses will be in the form of 
 		a dictionary containing the vaiable name as the key and a converted value
@@ -158,14 +183,24 @@ class RMPExchange:
 		Exit main
 		"""
 		#sys.exit()
-		print 'exited rmp_exchagne'
+		print 'exited rmp_exchange'
 				
 	def sendMotionCommand(self,command):
-		self.EventHandler.AddCommand([RMP_MOTION_CMD_ID,command.linear,command.angular])
+		#TODO how to handle omni directional in cmd_vel
+		if not self.isOmni:
+			self.EventHandler.AddCommand([RMP_MOTION_CMD_ID,command.linear.x,command.angular.z])
+		else:
+			self.EventHandler.AddCommand([RMP_OMNI_MOTION_CMD_ID,command.linear.x,command.linear.y, command.angular.z])
 	
 	def sendRMPCommand(self,command):
-		#TODO: add checks for various types of Commands 
-		self.EventHandler.AddCommand([command.cmd_id, command.arg1, command.arg2])
+		if command.cmd_id == 1280 or command.cmd_id == 1281: 
+			cmd = [command.cmd_id, command.arg1, command.arg2] 
+			if isValidCommand(cmd):
+				self.EventHandler.AddCommand(cmd)
+		elif command.cmd_id == 1536:
+			cmd = [command.cmd_id, command.arg1, command.arg2, command.arg3] 
+			if isValidCommand(cmd):
+				self.EventHandler.AddCommand(cmd)
 		
 	def publishFeedback(self,fb_dict):
 		snrValues = []
@@ -202,6 +237,200 @@ class RMPExchange:
 		self.rmpFeedback.ip_values = ipValues
 		self.feedbackPub.publish(self.rmpFeedback)
 			
+	def isValidCommand(self, command):
+		if command[0] == 1280 or command[0] == 1536:
+			return True
+		elif command[0] == 1281:
+			if (command[1] >= 0 and command[1] <= 20) or (command[1] >=30 and  command[1] <=35):
+				if command[1] == RMP_CMD_NONE:
+					return True
+				elif command[1] == RMP_CMD_SET_MAXIMUM_VELOCITY:
+					if command[2] > MAX_VELOCITY_MPS:
+						rospy.logwarn("%s velocity was over max limit; set to %s", command[2], MAX_VELOCITY_MPS)
+						command[2] = MAX_VELOCITY_MPS
+					elif command[2] < MIN_VELOCITY_MPS:
+						rospy.logwarn("%s velocity was under min limit; set to %s", command[2], MIN_VELOCITY_MPS)
+						command[2] = MIN_VELOCITY_MPS
+					return True
+				elif command[1] == RMP_CMD_SET_MAXIMUM_ACCELERATION:
+					if command[2] > MAX_ACCELERATION_MPS2:
+						rospy.logwarn("%s acceleration was over max limit; set to %s", command[2], MAX_ACCELERATION_MPS2)
+						command[2] = MAX_ACCELERATION_MPS2
+					elif command[2] < MIN_ACCELERATION_MPS2:
+						rospy.logwarn("%s acceleration was under min limit; set to %s", command[2], MIN_ACCELERATION_MPS2)
+						command[2] = MIN_ACCELERATION_MPS2
+					return True
+				elif command[1] == RMP_CMD_SET_MAXIMUM_DECELERATION:
+					if command[2] > MAX_DECELERATION_MPS2:
+						rospy.logwarn("(%s) deceleration was over max limit; set to %s", command[2], MAX_DECELERATION_MPS2)
+						command[2] = MAX_DECELERATION_MPS2
+					elif command[2] < MIN_DECELERATION_MPS2:
+						rospy.logwarn("(%s) deceleration was under min limit; set to %s", command[2], MIN_DECELERATION_MPS2)
+						command[2] = MIN_DECELERATION_MPS2
+					return True
+				elif command[1] == RMP_CMD_SET_MAXIMUM_DTZ_DECEL_RATE:
+					if command[2] > MAX_DTZ_DECEL_RATE_MPS2:
+						rospy.logwarn("(%s) dtz_decel was over max limit; set to %s", command[2], MAX_DTZ_DECEL_RATE_MPS2)
+						command[2] = MAX_DTZ_DECEL_RATE_MPS2
+					elif command[2] < MIN_DTZ_DECEL_RATE_MPS2:
+						rospy.logwarn("(%s) dtz_decel was under min limit; set to %s", command[2], MIN_DTZ_DECEL_RATE_MPS2)
+						command[2] = MIN_DTZ_DECEL_RATE_MPS2
+					return True
+				elif command[1] == RMP_CMD_SET_COASTDOWN_ACCEL:
+					if command[2] > MAX_COASTDOWN_ACCEL_MPS2:
+						rospy.logwarn("(%s) coastdown was over max limit; set to %s", command[2], MAX_COASTDOWN_ACCEL_MPS2)
+						command[2] = MAX_COASTDOWN_ACCEL_MPS2
+					elif command[2] < MIN_COASTDOWN_ACCEL_MPS2:
+						rospy.logwarn("(%s) coastdown was under min limit; set to %s", command[2], MIN_COASTDOWN_ACCEL_MPS2)
+						command[2] = MIN_COASTDOWN_ACCEL_MPS2
+					return True
+				elif command[1] == RMP_CMD_SET_MAXIMUM_TURN_RATE:
+					if command[2] > MAX_YAW_RATE_RPS:
+						rospy.logwarn("%s yaw_rate was over max limit; set to %s", command[2], MAX_YAW_RATE_RPS)
+						command[2] = MAX_YAW_RATE_RPS
+					elif command[2] < MIN_YAW_RATE_RPS:
+						rospy.logwarn("%s yaw_rate was under min limit; set to %s", command[2], MIN_YAW_RATE_RPS)
+						command[2] = MIN_YAW_RATE_RPS
+					return True
+				elif command[1] == RMP_CMD_SET_MAXIMUM_TURN_ACCEL:
+					if command[2] > MAX_YAW_ACCEL_RPS2:
+						rospy.logwarn("%s yaw_accel was over max limit; set to %s", command[2], MAX_YAW_ACCEL_RPS2)
+						command[2] = MAX_YAW_ACCEL_RPS2
+					elif command[2] < MIN_YAW_ACCEL_RPS2:
+						rospy.logwarn("%s yaw_accel was under min limit; set to %s", command[2], MIN_YAW_ACCEL_RPS2)
+						command[2] = MIN_YAW_ACCEL_RPS2
+					return True
+				elif command[1] == RMP_CMD_SET_TIRE_DIAMETER:
+					if command[2] > MAX_TIRE_DIAMETER_M:
+						rospy.logwarn("%s tire diameter was over max limit; set to %s", command[2], MAX_TIRE_DIAMETER_M)
+						command[2] = MAX_TIRE_DIAMETER_M
+					elif command[2] < MIN_TIRE_DIAMETER_M:
+						rospy.logwarn("%s tire diameter was under min limit; set to %s", command[2], MIN_TIRE_DIAMETER_M)
+						command[2] = MIN_TIRE_DIAMETER_M
+					return True
+				elif command[1] == RMP_CMD_SET_WHEEL_BASE_LENGTH:
+					if command[2] > MAX_WHEEL_BASE_LENGTH_M:
+						rospy.logwarn("%s wheel base was over max limit; set to %s", command[2], MAX_WHEEL_BASE_LENGTH_M)
+						command[2] = MAX_WHEEL_BASE_LENGTH_M
+					elif command[2] < MIN_WHEEL_BASE_LENGTH_M:
+						rospy.logwarn("%s wheel base was under min limit; set to %s", command[2], MIN_WHEEL_BASE_LENGTH_M)
+						command[2] = MIN_WHEEL_BASE_LENGTH_M
+					return True
+				elif command[1] == RMP_CMD_SET_WHEEL_TRACK_WIDTH:
+					if command[2] > MAX_WHEEL_TRACK_WIDTH_M:
+						rospy.logwarn("%s wheel track was over max limit; set to %s", command[2], MAX_WHEEL_TRACK_WIDTH_M)
+						command[2] = MAX_WHEEL_TRACK_WIDTH_M
+					elif command[2] < MIN_WHEEL_TRACK_WIDTH_M:
+						rospy.logwarn("%s wheel_track was under min limit; set to %s", command[2], MIN_WHEEL_TRACK_WIDTH_M)
+						command[2] = MIN_WHEEL_TRACK_WIDTH_M
+					return True
+				elif command[1] == RMP_CMD_SET_TRANSMISSION_RATIO:
+					if command[2] > MAX_TRANSMISSION_RATIO:
+						rospy.logwarn("%s gear ratio was over max limit; set to %s", command[2], MAX_TRANSMISSION_RATIO)
+						command[2] = MAX_TRANSMISSION_RATIO
+					elif command[2] < MIN_TRANSMISSION_RATIO:
+						rospy.logwarn("%s gear ratio was under min limit; set to %s", command[2], MIN_TRANSMISSION_RATIO)
+						command[2] = MIN_TRANSMISSION_RATIO
+					return True
+				elif command[1] == RMP_CMD_SET_INPUT_CONFIG_BITMAP:
+					if command[2] >= 0:
+						return True
+					else:
+						rospy.logwarn("Invalid input config bitmap")
+						return False
+				elif command[1] == RMP_CMD_SET_ETH_IP_ADDRESS:
+					try:
+						dottedQuadToNum(command[2])
+						return True
+					except:
+						rospy.logwarn("Invalid ip address")
+						return False
+				elif command[1] == RMP_CMD_SET_ETH_PORT_NUMBER:
+					if command[2] > 0:
+						return True
+					else:
+						rospy.logwarn("Invalid port number")
+						return False
+				elif command[1] == RMP_CMD_SET_ETH_SUBNET_MASK:
+					try:
+						dottedQuadToNum(command[2])
+						return True
+					except:
+						rospy.logwarn("Invalid subnet mask")
+						return False
+				elif command[1] == RMP_CMD_SET_ETH_GATEWAY:
+					try:
+						dottedQuadToNum(command[2])
+						return True
+					except:
+						rospy.logwarn("Invalid gateway")
+						return False
+				elif command[1] == RMP_CMD_SET_USER_FB_1_BITMAP:
+					if command[2] >= 0:
+						return True
+					else:
+						rospy.logwarn("Invalid user feedback 1 bitmap")
+						return False
+				elif command[1] == RMP_CMD_SET_USER_FB_2_BITMAP:
+					if command[2] >= 0:
+						return True
+					else:
+						rospy.logwarn("Invalid user feedback 2 bitmap")
+						return False
+				elif command[1] == RMP_CMD_SET_USER_FB_3_BITMAP:
+					if command[2] >= 0:
+						return True
+					else:
+						rospy.logwarn("Invalid user feedback 3 bitmap")
+						return False
+				elif command[1] == RMP_CMD_SET_USER_FB_4_BITMAP:
+					if command[2] >= 0:
+						return True
+					else:
+						rospy.logwarn("Invalid user feedback 4 bitmap")
+						return False
+				elif command[1] == RMP_CMD_SET_AUDIO_COMMAND:
+					if command[2] >= 0 and command[2] <= 16:
+						return True
+					else:
+						rospy.logwarn("Invalid audio command")
+						return False
+				elif command[1] == RMP_CMD_SET_OPERATIONAL_MODE:
+					if command[2] >= 1 and command[2] <= 6:
+						return True
+					else:
+						rospy.logwarn("Invalid operational mode")
+						return False
+				elif command[1] == RMP_CMD_SEND_SP_FAULTLOG: 
+					if command[2] >= 0 and command[2] <= 1:
+						return True
+					else:
+						rospy.logwarn("Invalid faultlog command")
+						return False
+				elif command[1] == RMP_CMD_RESET_INTEGRATORS: 
+					if command[2] >= 0 or command[2] <= 31:
+						return True
+					else:
+						rospy.logwarn("Invalid integrators reset command")
+						return False
+				elif command[1] == RMP_CMD_RESET_PARAMS_TO_DEFAULT:
+					return True
+				else:
+					rospy.logwarn("Invalid command")
+					return False
+			else:
+				rospy.logwarn("Invalid argument")
+				return False
+		else:
+			rospy.logwarn("Invalid command id")
+			return False
+	
+	def initRMPParams(self):
+		for param in self.rmpParams:
+			command = [RMP_CFG_CMD_ID, param[0], param[1]]
+			if (True == self.isValidCommand(command)):
+				self.EventHandler.AddCommand(command)
+	
 	def rmp_send_recv(self):
 		"""
 		Initialize the ROS node
@@ -211,13 +440,25 @@ class RMPExchange:
 		rospy.Subscriber("cmd_vel", Twist, self.sendMotionCommand)
 		print "RMP exchange node started."
 		
+		"""
+		Add a Feedback listener to the segway driver
+		"""
 		self.EventHandler.AddListener(self.publishFeedback)
 		
+		"""
+		Initialize the parameters to the Segway
+		"""
+		self.initRMPParams()
+				
 		"""
 		Generate a goto tractor event
 		"""
 		self.EventHandler.GotoTractor()
 		print "In Tractor Mode"
+		
+		"""
+		Main loop to continually empty yhe out_flags queue
+		"""
 		while not rospy.is_shutdown() and self.EventHandler._continue:
 			while not self.out_flags.empty() and self.EventHandler._continue:
 				self.EventHandler.handle_event[self.out_flags.get()]()

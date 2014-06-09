@@ -1,4 +1,7 @@
 #valid command ids for the segway
+#[RMP_MOTION_CMD_ID,norm_vel_cmd,norm_yaw_cmd]
+#[RMP_OMNI_MOTION_CMD_ID,norm_vel_cmd,norm_yaw_cmd,angle_cmd_deg]
+#[RMP_CFG_CMD_ID,gp_cmd,gp_param]
 uint32 RMP_MOTION_CMD_ID = 1280
 uint32 RMP_OMNI_MOTION_CMD_ID = 1536
 uint32 RMP_CFG_CMD_ID = 1281
@@ -22,4 +25,5 @@ Header header
 uint32 cmd_id
 float32 arg1
 float32 arg2
+float32 arg3
 
