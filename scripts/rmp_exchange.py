@@ -111,11 +111,7 @@ class RMPExchange:
 		else:
 			rospy.logwarn("Update delay time is too fast, set to 0.01 seconds")
 			UPDATE_DELAY_SEC = 0.01
-		print "\n"
-		print rospy.get_param_names()
-		print "\n"
-		if rospy.has_param('/rmp_exchange/my_velocity_limit_mps'):	
-			print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+
 		self.rmpParams = []
 		self.rmpParams.append([RMP_CMD_SET_MAXIMUM_VELOCITY,rospy.get_param('~my_velocity_limit_mps',DEFAULT_MAXIMUM_VELOCITY_MPS)])
 		self.rmpParams.append([RMP_CMD_SET_MAXIMUM_ACCELERATION,rospy.get_param('~my_accel_limit_mps2',DEFAULT_MAXIMUM_ACCELERATION_MPS2)])
@@ -435,7 +431,6 @@ class RMPExchange:
 		"""
 		Initialize the ROS node
 		"""
-		rospy.init_node('rmp_exchange')
 		rospy.Subscriber("rmp_command", rmpCommand, self.sendRMPCommand)
 		rospy.Subscriber("cmd_vel", Twist, self.sendMotionCommand)
 		print "RMP exchange node started."
@@ -464,6 +459,7 @@ class RMPExchange:
 				self.EventHandler.handle_event[self.out_flags.get()]()
 			
 if __name__ == "__main__":
+	rospy.init_node('rmp_exchange')
 	rmp_command = RMPExchange()
 	rmp_command.rmp_send_recv()	
 
