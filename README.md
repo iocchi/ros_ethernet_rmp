@@ -1,9 +1,7 @@
 ros_ethernet_rmp
 ================
 
-ROS Wrapper for the Segway RMP Ethernet Python Driver
-
-#### Control and Query for the Segway RMP
+#### ROS Wrapper for the Segway RMP Ethernet Python Driver
 Some Segway Inc. code was adapted to be a ROS node and wrapper for the python_ethernet_rmp library.
 
 ### License
