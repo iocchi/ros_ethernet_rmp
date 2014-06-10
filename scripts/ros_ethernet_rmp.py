@@ -46,7 +46,6 @@ CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
 --------------------------------------------------------------------
 """
 
-
 """
 ROS wrapper for the python ethernet RMP driver. This is an adaptation of example code provided by Segway Inc.
 
@@ -68,18 +67,6 @@ from python_ethernet_rmp.rmp_config_params import *
 from geometry_msgs.msg import Twist
 import sys,time,threading,Queue
 import rospy
-
-"""
-Define the update delay or update period in seconds. Must be greater
-than the minimum of 0.01s
-"""
-UPDATE_DELAY_SEC = 0.02
-
-"""
-Define whether to log the output data in a file. This will create a unique CSV
-file in ./RMP_DATA_LOGS with the filename containing a time/date stamp 
-"""
-LOG_DATA = True			 
 
 """
 The platform address may be different than the one in your config
@@ -104,11 +91,11 @@ class RMPExchange:
 		"""
 		Read in the Ros Params and add them to a array to set the config params
 		"""
-		global UPDATE_DELAY_SEC, LOG_DATA, rmp_addr 
-		update_time = rospy.get_param('/update_delay_sec',0.05)
-		LOG_DATA = rospy.get_param('~log_data',False)
-		ip_addr = rospy.get_param('~current_rmp_ip_addr',DEFAULT_IP_ADDRESS)
-		port_num = rospy.get_param('~current_rmp_port_num',DEFAULT_PORT_NUMBER)
+		global rmp_addr
+		update_delay_sec = rospy.get_param('~update_delay_sec', 0.05)
+		log_data = rospy.get_param('~log_data', False)
+		ip_addr = rospy.get_param('~current_rmp_ip_addr', DEFAULT_IP_ADDRESS)
+		port_num = rospy.get_param('~current_rmp_port_num', DEFAULT_PORT_NUMBER)
 		self.isOmni = rospy.get_param('~is_omni ',False)
 		try:
 			dottedQuadToNum(ip_addr)
@@ -118,13 +105,10 @@ class RMPExchange:
 				rospy.logwarn("current_rmp_port_num is not a valid port number")	
 		except:
 			rospy.logwarn("current_rmp_ip_addr in not in dotted quad format")
-		
-		
-		if update_time >= 0.01:
-			UPDATE_DELAY_SEC = update_time
-		else:
-			rospy.logwarn("Update delay time is too fast, set to 0.01 seconds")
-			UPDATE_DELAY_SEC = 0.01
+
+		if update_delay_sec < 0.01:
+			rospy.logwarn("Update delay time is too fast -- setting to 0.01 seconds.")
+			update_delay_sec = 0.01
 
 		self.rmpParams = []
 		self.rmpParams.append([RMP_CMD_SET_MAXIMUM_VELOCITY,rospy.get_param('~my_velocity_limit_mps',DEFAULT_MAXIMUM_VELOCITY_MPS)])
@@ -162,7 +146,7 @@ class RMPExchange:
 		"""
 		Create the thread to run RMP 
 		"""
-		self.my_thread = threading.Thread(target=RMP, args=(rmp_addr,self.rsp_queue,self.cmd_queue,self.in_flags,self.out_flags,UPDATE_DELAY_SEC,LOG_DATA))
+		self.my_thread = threading.Thread(target=RMP, args=(rmp_addr,self.rsp_queue,self.cmd_queue,self.in_flags,self.out_flags,update_delay_sec, log_data))
 		self.my_thread.daemon = True
 		self.my_thread.start()
 		

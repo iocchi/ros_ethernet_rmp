@@ -5,7 +5,7 @@
 -->
 
 <launch>
-  <arg name="update_delay" value="0.02" />
+  <arg name="update_delay_sec" value="0.02" />
   <arg name="log_data" value="false" />
   <arg name="cur_rmp_ip_addr" value="192.168.0.40" />
   <arg name="cur_rmp_port_num" value="8080" />
@@ -32,7 +32,7 @@
   <arg name="user_defined_feedback_bitmap_4" value="0" />
 
   <node pkg="ros_ethernet_rmp" type="ros_ethernet_rmp.py" name="ros_ethernet_rmp" output="screen">
-    <param name="update_delay_sec" type="double" value="$(arg update_delay)" />
+    <param name="update_delay_sec" type="double" value="$(arg update_delay_sec)" />
     <param name="log_data" type="bool" value="$(arg log_data)" />
     <param name="current_rmp_ip_addr" type="string" value="$(arg cur_rmp_ip_addr)" />
     <param name="current_rmp_port_num" type="int" value="$(arg cur_rmp_port_num)" />
