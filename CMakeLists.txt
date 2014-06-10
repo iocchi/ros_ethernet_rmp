@@ -45,11 +45,11 @@ catkin_package(
 ## Mark executable scripts (Python etc.) for installation
 install(PROGRAMS
   scripts/rmp_exchange.py
-  scripts/pose_update.py
+  scripts/rmp_pose_updater.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 install(FILES
-  launch/carl_params.launch
+  launch/ros_ethernet_rmp.launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )
