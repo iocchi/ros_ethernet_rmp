@@ -47,7 +47,7 @@ arising out of or based upon:
  IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
  CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
 --------------------------------------------------------------------"""
-from ros_ethernet_rmp.msg import rmpCommand, rmpFeedback
+from ros_ethernet_rmp.msg import RMPCommand, RMPFeedback
 from python_ethernet_rmp.rmp_interface import RMP
 from python_ethernet_rmp.system_defines import *
 from python_ethernet_rmp.user_event_handlers import RMPEventHandlers
@@ -160,8 +160,8 @@ class RMPExchange:
 		"""
 		Initialize the feedback publisher
 		"""
-		self.rmpFeedback = rmpFeedback()
-		self.feedbackPub = rospy.Publisher('rmp_feedback', rmpFeedback, False, None, None)
+		self.rmpFeedback = RMPFeedback()
+		self.feedbackPub = rospy.Publisher('rmp_feedback', RMPFeedback, False, None, None)
 		
 	def __del__(self):
 		"""
@@ -431,7 +431,7 @@ class RMPExchange:
 		"""
 		Initialize the ROS node
 		"""
-		rospy.Subscriber("rmp_command", rmpCommand, self.sendRMPCommand)
+		rospy.Subscriber("rmp_command", RMPCommand, self.sendRMPCommand)
 		rospy.Subscriber("cmd_vel", Twist, self.sendMotionCommand)
 		print "RMP exchange node started."
 		
