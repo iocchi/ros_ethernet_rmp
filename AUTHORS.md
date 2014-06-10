@@ -1,7 +1,8 @@
 Original Authors
 ----------------
 
- * [Russell Toris](http://users.wpi.edu/~rctoris/) (rctoris@wpi.edu)
+ * [SEGWAY Inc.](http://rmp.segway.com/)
+ * [Chris Dunkers](cmdunkers@wpi.edu)
 
 Contributors
 ------------
