@@ -1,71 +1,72 @@
 #!/usr/bin/env python
-import roslib 
-roslib.load_manifest('ros_ethernet_rmp')
-roslib.load_manifest('python_ethernet_rmp')
-import rospy
 
-"""--------------------------------------------------------------------
+"""
+--------------------------------------------------------------------
 COPYRIGHT 2013 SEGWAY Inc.
 
 Software License Agreement:
 
-The software supplied herewith by Segway Inc. (the "Company") for its 
-RMP Robotic Platforms is intended and supplied to you, the Company's 
-customer, for use solely and exclusively with Segway products. The 
-software is owned by the Company and/or its supplier, and is protected 
-under applicable copyright laws.  All rights are reserved. Any use in 
-violation of the foregoing restrictions may subject the user to criminal 
-sanctions under applicable laws, as well as to civil liability for the 
-breach of the terms and conditions of this license. The Company may 
-immediately terminate this Agreement upon your use of the software with 
+The software supplied herewith by Segway Inc. (the "Company") for its
+RMP Robotic Platforms is intended and supplied to you, the Company's
+customer, for use solely and exclusively with Segway products. The
+software is owned by the Company and/or its supplier, and is protected
+under applicable copyright laws.  All rights are reserved. Any use in
+violation of the foregoing restrictions may subject the user to criminal
+sanctions under applicable laws, as well as to civil liability for the
+breach of the terms and conditions of this license. The Company may
+immediately terminate this Agreement upon your use of the software with
 any products that are not Segway products.
 
-The software was written using Python programming language.  Your use 
-of the software is therefore subject to the terms and conditions of the 
-OSI- approved open source license viewable at http://www.python.org/.  
-You are solely responsible for ensuring your compliance with the Python 
+The software was written using Python programming language.  Your use
+of the software is therefore subject to the terms and conditions of the
+OSI- approved open source license viewable at http://www.python.org/.
+You are solely responsible for ensuring your compliance with the Python
 open source license.
 
-You shall indemnify, defend and hold the Company harmless from any claims, 
-demands, liabilities or expenses, including reasonable attorneys fees, incurred 
-by the Company as a result of any claim or proceeding against the Company 
-arising out of or based upon: 
+You shall indemnify, defend and hold the Company harmless from any claims,
+demands, liabilities or expenses, including reasonable attorneys fees, incurred
+by the Company as a result of any claim or proceeding against the Company
+arising out of or based upon:
 
-(i) The combination, operation or use of the software by you with any hardware, 
-	products, programs or data not supplied or approved in writing by the Company, 
-	if such claim or proceeding would have been avoided but for such combination, 
+(i) The combination, operation or use of the software by you with any hardware,
+	products, programs or data not supplied or approved in writing by the Company,
+	if such claim or proceeding would have been avoided but for such combination,
 	operation or use.
- 
-(ii) The modification of the software by or on behalf of you 
+
+(ii) The modification of the software by or on behalf of you
 
 (iii) Your use of the software.
 
- THIS SOFTWARE IS PROVIDED IN AN "AS IS" CONDITION. NO WARRANTIES,
- WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT LIMITED
- TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. THE COMPANY SHALL NOT,
- IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
- CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
---------------------------------------------------------------------"""
-from ros_ethernet_rmp.msg import rmpCommand, rmpFeedback
+THIS SOFTWARE IS PROVIDED IN AN "AS IS" CONDITION. NO WARRANTIES,
+WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT LIMITED
+TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. THE COMPANY SHALL NOT,
+IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
+CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+--------------------------------------------------------------------
+"""
+
+"""
+ROS wrapper for the python ethernet RMP driver. This is an adaptation of example code provided by Segway Inc.
+
+Author:  Segway Inc.
+Author:  Chris Dunkers, Worcester Polytechnic Institute
+Author:  Russell Toris, Worcester Polytechnic Institute
+Version: June 10, 2014
+"""
+
+import roslib 
+roslib.load_manifest('ros_ethernet_rmp')
+roslib.load_manifest('python_ethernet_rmp')
+
+from ros_ethernet_rmp.msg import RMPCommand, RMPFeedback
 from python_ethernet_rmp.rmp_interface import RMP
 from python_ethernet_rmp.system_defines import *
 from python_ethernet_rmp.user_event_handlers import RMPEventHandlers
 from python_ethernet_rmp.rmp_config_params import *
 from geometry_msgs.msg import Twist
 import sys,time,threading,Queue
-
-"""
-Define the update delay or update period in seconds. Must be greater
-than the minimum of 0.01s
-"""
-UPDATE_DELAY_SEC = 0.02
-
-"""
-Define whether to log the output data in a file. This will create a unique CSV
-file in ./RMP_DATA_LOGS with the filename containing a time/date stamp 
-"""
-LOG_DATA = True			 
+import rospy
 
 """
 The platform address may be different than the one in your config
@@ -90,11 +91,11 @@ class RMPExchange:
 		"""
 		Read in the Ros Params and add them to a array to set the config params
 		"""
-		global UPDATE_DELAY_SEC, LOG_DATA, rmp_addr 
-		update_time = rospy.get_param('/update_delay_sec',0.05)
-		LOG_DATA = rospy.get_param('~log_data',False)
-		ip_addr = rospy.get_param('~current_rmp_ip_addr',DEFAULT_IP_ADDRESS)
-		port_num = rospy.get_param('~current_rmp_port_num',DEFAULT_PORT_NUMBER)
+		global rmp_addr
+		update_delay_sec = rospy.get_param('~update_delay_sec', 0.05)
+		log_data = rospy.get_param('~log_data', False)
+		ip_addr = rospy.get_param('~current_rmp_ip_addr', DEFAULT_IP_ADDRESS)
+		port_num = rospy.get_param('~current_rmp_port_num', DEFAULT_PORT_NUMBER)
 		self.isOmni = rospy.get_param('~is_omni ',False)
 		try:
 			dottedQuadToNum(ip_addr)
@@ -104,13 +105,10 @@ class RMPExchange:
 				rospy.logwarn("current_rmp_port_num is not a valid port number")	
 		except:
 			rospy.logwarn("current_rmp_ip_addr in not in dotted quad format")
-		
-		
-		if update_time >= 0.01:
-			UPDATE_DELAY_SEC = update_time
-		else:
-			rospy.logwarn("Update delay time is too fast, set to 0.01 seconds")
-			UPDATE_DELAY_SEC = 0.01
+
+		if update_delay_sec < 0.01:
+			rospy.logwarn("Update delay time is too fast -- setting to 0.01 seconds.")
+			update_delay_sec = 0.01
 
 		self.rmpParams = []
 		self.rmpParams.append([RMP_CMD_SET_MAXIMUM_VELOCITY,rospy.get_param('~my_velocity_limit_mps',DEFAULT_MAXIMUM_VELOCITY_MPS)])
@@ -148,7 +146,7 @@ class RMPExchange:
 		"""
 		Create the thread to run RMP 
 		"""
-		self.my_thread = threading.Thread(target=RMP, args=(rmp_addr,self.rsp_queue,self.cmd_queue,self.in_flags,self.out_flags,UPDATE_DELAY_SEC,LOG_DATA))
+		self.my_thread = threading.Thread(target=RMP, args=(rmp_addr,self.rsp_queue,self.cmd_queue,self.in_flags,self.out_flags,update_delay_sec, log_data))
 		self.my_thread.daemon = True
 		self.my_thread.start()
 		
@@ -160,8 +158,26 @@ class RMPExchange:
 		"""
 		Initialize the feedback publisher
 		"""
-		self.rmpFeedback = rmpFeedback()
-		self.feedbackPub = rospy.Publisher('rmp_feedback', rmpFeedback, False, None, None)
+		self.rmpFeedback = RMPFeedback()
+		self.feedbackPub = rospy.Publisher('rmp_feedback', RMPFeedback, False, None, None)
+
+		rospy.Subscriber("rmp_command", RMPCommand, self.sendRMPCommand)
+		rospy.Subscriber("cmd_vel", Twist, self.sendMotionCommand)
+
+		"""
+		Add a Feedback listener to the segway driver
+		"""
+		self.EventHandler.AddListener(self.publishFeedback)
+
+		"""
+		Initialize the parameters to the Segway
+		"""
+		self.initRMPParams()
+
+		"""
+		Generate a goto tractor event
+		"""
+		self.EventHandler.GotoTractor()
 		
 	def __del__(self):
 		"""
@@ -191,11 +207,11 @@ class RMPExchange:
 	def sendRMPCommand(self,command):
 		if command.cmd_id == 1280 or command.cmd_id == 1281: 
 			cmd = [command.cmd_id, command.arg1, command.arg2] 
-			if isValidCommand(cmd):
+			if self.isValidCommand(cmd):
 				self.EventHandler.AddCommand(cmd)
 		elif command.cmd_id == 1536:
 			cmd = [command.cmd_id, command.arg1, command.arg2, command.arg3] 
-			if isValidCommand(cmd):
+			if self.isValidCommand(cmd):
 				self.EventHandler.AddCommand(cmd)
 		
 	def publishFeedback(self,fb_dict):
@@ -429,29 +445,6 @@ class RMPExchange:
 	
 	def rmp_send_recv(self):
 		"""
-		Initialize the ROS node
-		"""
-		rospy.Subscriber("rmp_command", rmpCommand, self.sendRMPCommand)
-		rospy.Subscriber("cmd_vel", Twist, self.sendMotionCommand)
-		print "RMP exchange node started."
-		
-		"""
-		Add a Feedback listener to the segway driver
-		"""
-		self.EventHandler.AddListener(self.publishFeedback)
-		
-		"""
-		Initialize the parameters to the Segway
-		"""
-		self.initRMPParams()
-				
-		"""
-		Generate a goto tractor event
-		"""
-		self.EventHandler.GotoTractor()
-		print "In Tractor Mode"
-		
-		"""
 		Main loop to continually empty yhe out_flags queue
 		"""
 		while not rospy.is_shutdown() and self.EventHandler._continue:
@@ -459,7 +452,7 @@ class RMPExchange:
 				self.EventHandler.handle_event[self.out_flags.get()]()
 			
 if __name__ == "__main__":
-	rospy.init_node('rmp_exchange')
+	rospy.init_node('ros_ethernet_rmp')
 	rmp_command = RMPExchange()
+	rospy.loginfo("ROS Ethernet RMP Node Started")
 	rmp_command.rmp_send_recv()	
-
