@@ -55,17 +55,16 @@ Author:  Russell Toris, Worcester Polytechnic Institute
 Version: June 10, 2014
 """
 
-import roslib 
-roslib.load_manifest('ros_ethernet_rmp')
-roslib.load_manifest('python_ethernet_rmp')
-
 from ros_ethernet_rmp.msg import RMPCommand, RMPFeedback
 from python_ethernet_rmp.rmp_interface import RMP
 from python_ethernet_rmp.system_defines import *
 from python_ethernet_rmp.user_event_handlers import RMPEventHandlers
 from python_ethernet_rmp.rmp_config_params import *
+from python_ethernet_rmp.utils import *
 from geometry_msgs.msg import Twist
+from rmp_config_limits import *
 import sys,time,threading,Queue
+import math
 import rospy
 
 """
@@ -159,7 +158,7 @@ class RMPExchange:
 		Initialize the feedback publisher
 		"""
 		self.rmpFeedback = RMPFeedback()
-		self.feedbackPub = rospy.Publisher('rmp_feedback', RMPFeedback, False, None, None)
+		self.feedbackPub = rospy.Publisher('rmp_feedback', RMPFeedback, queue_size = 'None')
 
 		rospy.Subscriber("rmp_command", RMPCommand, self.sendRMPCommand)
 		rospy.Subscriber("cmd_vel", Twist, self.sendMotionCommand)
@@ -198,11 +197,12 @@ class RMPExchange:
 		print 'exited rmp_exchange'
 				
 	def sendMotionCommand(self,command):
-		#TODO how to handle omni directional in cmd_vel
 		if not self.isOmni:
 			self.EventHandler.AddCommand([RMP_MOTION_CMD_ID,command.linear.x,command.angular.z])
 		else:
-			self.EventHandler.AddCommand([RMP_OMNI_MOTION_CMD_ID,command.linear.x,command.linear.y, command.angular.z])
+			forw_vel = math.sqrt(command.linear.x**2 + command.linear.y**2)/math.sqrt(2)
+			angle = math.atan2(command.linear.y, command.linear.x) + math.pi
+			self.EventHandler.AddCommand([RMP_OMNI_MOTION_CMD_ID,forw_vel,command.angular.z, angle])
 	
 	def sendRMPCommand(self,command):
 		if command.cmd_id == 1280 or command.cmd_id == 1281: 
@@ -250,191 +250,24 @@ class RMPExchange:
 		self.feedbackPub.publish(self.rmpFeedback)
 			
 	def isValidCommand(self, command):
-		if command[0] == 1280 or command[0] == 1536:
+		if command[0] == 1280:
 			return True
-		elif command[0] == 1281:
-			if (command[1] >= 0 and command[1] <= 20) or (command[1] >=30 and  command[1] <=35):
-				if command[1] == RMP_CMD_NONE:
-					return True
-				elif command[1] == RMP_CMD_SET_MAXIMUM_VELOCITY:
-					if command[2] > MAX_VELOCITY_MPS:
-						rospy.logwarn("%s velocity was over max limit; set to %s", command[2], MAX_VELOCITY_MPS)
-						command[2] = MAX_VELOCITY_MPS
-					elif command[2] < MIN_VELOCITY_MPS:
-						rospy.logwarn("%s velocity was under min limit; set to %s", command[2], MIN_VELOCITY_MPS)
-						command[2] = MIN_VELOCITY_MPS
-					return True
-				elif command[1] == RMP_CMD_SET_MAXIMUM_ACCELERATION:
-					if command[2] > MAX_ACCELERATION_MPS2:
-						rospy.logwarn("%s acceleration was over max limit; set to %s", command[2], MAX_ACCELERATION_MPS2)
-						command[2] = MAX_ACCELERATION_MPS2
-					elif command[2] < MIN_ACCELERATION_MPS2:
-						rospy.logwarn("%s acceleration was under min limit; set to %s", command[2], MIN_ACCELERATION_MPS2)
-						command[2] = MIN_ACCELERATION_MPS2
-					return True
-				elif command[1] == RMP_CMD_SET_MAXIMUM_DECELERATION:
-					if command[2] > MAX_DECELERATION_MPS2:
-						rospy.logwarn("(%s) deceleration was over max limit; set to %s", command[2], MAX_DECELERATION_MPS2)
-						command[2] = MAX_DECELERATION_MPS2
-					elif command[2] < MIN_DECELERATION_MPS2:
-						rospy.logwarn("(%s) deceleration was under min limit; set to %s", command[2], MIN_DECELERATION_MPS2)
-						command[2] = MIN_DECELERATION_MPS2
-					return True
-				elif command[1] == RMP_CMD_SET_MAXIMUM_DTZ_DECEL_RATE:
-					if command[2] > MAX_DTZ_DECEL_RATE_MPS2:
-						rospy.logwarn("(%s) dtz_decel was over max limit; set to %s", command[2], MAX_DTZ_DECEL_RATE_MPS2)
-						command[2] = MAX_DTZ_DECEL_RATE_MPS2
-					elif command[2] < MIN_DTZ_DECEL_RATE_MPS2:
-						rospy.logwarn("(%s) dtz_decel was under min limit; set to %s", command[2], MIN_DTZ_DECEL_RATE_MPS2)
-						command[2] = MIN_DTZ_DECEL_RATE_MPS2
-					return True
-				elif command[1] == RMP_CMD_SET_COASTDOWN_ACCEL:
-					if command[2] > MAX_COASTDOWN_ACCEL_MPS2:
-						rospy.logwarn("(%s) coastdown was over max limit; set to %s", command[2], MAX_COASTDOWN_ACCEL_MPS2)
-						command[2] = MAX_COASTDOWN_ACCEL_MPS2
-					elif command[2] < MIN_COASTDOWN_ACCEL_MPS2:
-						rospy.logwarn("(%s) coastdown was under min limit; set to %s", command[2], MIN_COASTDOWN_ACCEL_MPS2)
-						command[2] = MIN_COASTDOWN_ACCEL_MPS2
-					return True
-				elif command[1] == RMP_CMD_SET_MAXIMUM_TURN_RATE:
-					if command[2] > MAX_YAW_RATE_RPS:
-						rospy.logwarn("%s yaw_rate was over max limit; set to %s", command[2], MAX_YAW_RATE_RPS)
-						command[2] = MAX_YAW_RATE_RPS
-					elif command[2] < MIN_YAW_RATE_RPS:
-						rospy.logwarn("%s yaw_rate was under min limit; set to %s", command[2], MIN_YAW_RATE_RPS)
-						command[2] = MIN_YAW_RATE_RPS
-					return True
-				elif command[1] == RMP_CMD_SET_MAXIMUM_TURN_ACCEL:
-					if command[2] > MAX_YAW_ACCEL_RPS2:
-						rospy.logwarn("%s yaw_accel was over max limit; set to %s", command[2], MAX_YAW_ACCEL_RPS2)
-						command[2] = MAX_YAW_ACCEL_RPS2
-					elif command[2] < MIN_YAW_ACCEL_RPS2:
-						rospy.logwarn("%s yaw_accel was under min limit; set to %s", command[2], MIN_YAW_ACCEL_RPS2)
-						command[2] = MIN_YAW_ACCEL_RPS2
-					return True
-				elif command[1] == RMP_CMD_SET_TIRE_DIAMETER:
-					if command[2] > MAX_TIRE_DIAMETER_M:
-						rospy.logwarn("%s tire diameter was over max limit; set to %s", command[2], MAX_TIRE_DIAMETER_M)
-						command[2] = MAX_TIRE_DIAMETER_M
-					elif command[2] < MIN_TIRE_DIAMETER_M:
-						rospy.logwarn("%s tire diameter was under min limit; set to %s", command[2], MIN_TIRE_DIAMETER_M)
-						command[2] = MIN_TIRE_DIAMETER_M
-					return True
-				elif command[1] == RMP_CMD_SET_WHEEL_BASE_LENGTH:
-					if command[2] > MAX_WHEEL_BASE_LENGTH_M:
-						rospy.logwarn("%s wheel base was over max limit; set to %s", command[2], MAX_WHEEL_BASE_LENGTH_M)
-						command[2] = MAX_WHEEL_BASE_LENGTH_M
-					elif command[2] < MIN_WHEEL_BASE_LENGTH_M:
-						rospy.logwarn("%s wheel base was under min limit; set to %s", command[2], MIN_WHEEL_BASE_LENGTH_M)
-						command[2] = MIN_WHEEL_BASE_LENGTH_M
-					return True
-				elif command[1] == RMP_CMD_SET_WHEEL_TRACK_WIDTH:
-					if command[2] > MAX_WHEEL_TRACK_WIDTH_M:
-						rospy.logwarn("%s wheel track was over max limit; set to %s", command[2], MAX_WHEEL_TRACK_WIDTH_M)
-						command[2] = MAX_WHEEL_TRACK_WIDTH_M
-					elif command[2] < MIN_WHEEL_TRACK_WIDTH_M:
-						rospy.logwarn("%s wheel_track was under min limit; set to %s", command[2], MIN_WHEEL_TRACK_WIDTH_M)
-						command[2] = MIN_WHEEL_TRACK_WIDTH_M
-					return True
-				elif command[1] == RMP_CMD_SET_TRANSMISSION_RATIO:
-					if command[2] > MAX_TRANSMISSION_RATIO:
-						rospy.logwarn("%s gear ratio was over max limit; set to %s", command[2], MAX_TRANSMISSION_RATIO)
-						command[2] = MAX_TRANSMISSION_RATIO
-					elif command[2] < MIN_TRANSMISSION_RATIO:
-						rospy.logwarn("%s gear ratio was under min limit; set to %s", command[2], MIN_TRANSMISSION_RATIO)
-						command[2] = MIN_TRANSMISSION_RATIO
-					return True
-				elif command[1] == RMP_CMD_SET_INPUT_CONFIG_BITMAP:
-					if command[2] >= 0:
-						return True
-					else:
-						rospy.logwarn("Invalid input config bitmap")
-						return False
-				elif command[1] == RMP_CMD_SET_ETH_IP_ADDRESS:
-					try:
-						dottedQuadToNum(command[2])
-						return True
-					except:
-						rospy.logwarn("Invalid ip address")
-						return False
-				elif command[1] == RMP_CMD_SET_ETH_PORT_NUMBER:
-					if command[2] > 0:
-						return True
-					else:
-						rospy.logwarn("Invalid port number")
-						return False
-				elif command[1] == RMP_CMD_SET_ETH_SUBNET_MASK:
-					try:
-						dottedQuadToNum(command[2])
-						return True
-					except:
-						rospy.logwarn("Invalid subnet mask")
-						return False
-				elif command[1] == RMP_CMD_SET_ETH_GATEWAY:
-					try:
-						dottedQuadToNum(command[2])
-						return True
-					except:
-						rospy.logwarn("Invalid gateway")
-						return False
-				elif command[1] == RMP_CMD_SET_USER_FB_1_BITMAP:
-					if command[2] >= 0:
-						return True
-					else:
-						rospy.logwarn("Invalid user feedback 1 bitmap")
-						return False
-				elif command[1] == RMP_CMD_SET_USER_FB_2_BITMAP:
-					if command[2] >= 0:
-						return True
-					else:
-						rospy.logwarn("Invalid user feedback 2 bitmap")
-						return False
-				elif command[1] == RMP_CMD_SET_USER_FB_3_BITMAP:
-					if command[2] >= 0:
-						return True
-					else:
-						rospy.logwarn("Invalid user feedback 3 bitmap")
-						return False
-				elif command[1] == RMP_CMD_SET_USER_FB_4_BITMAP:
-					if command[2] >= 0:
-						return True
-					else:
-						rospy.logwarn("Invalid user feedback 4 bitmap")
-						return False
-				elif command[1] == RMP_CMD_SET_AUDIO_COMMAND:
-					if command[2] >= 0 and command[2] <= 16:
-						return True
-					else:
-						rospy.logwarn("Invalid audio command")
-						return False
-				elif command[1] == RMP_CMD_SET_OPERATIONAL_MODE:
-					if command[2] >= 1 and command[2] <= 6:
-						return True
-					else:
-						rospy.logwarn("Invalid operational mode")
-						return False
-				elif command[1] == RMP_CMD_SEND_SP_FAULTLOG: 
-					if command[2] >= 0 and command[2] <= 1:
-						return True
-					else:
-						rospy.logwarn("Invalid faultlog command")
-						return False
-				elif command[1] == RMP_CMD_RESET_INTEGRATORS: 
-					if command[2] >= 0 or command[2] <= 31:
-						return True
-					else:
-						rospy.logwarn("Invalid integrators reset command")
-						return False
-				elif command[1] == RMP_CMD_RESET_PARAMS_TO_DEFAULT:
-					return True
-				else:
-					rospy.logwarn("Invalid command")
-					return False
+		elif command[0] == 1536:
+			if command[3] > 360 or command[3] < 0:
+				rospy.logwarn("arg3 is out of range. Must be between 0-360")
+				return False
 			else:
-				rospy.logwarn("Invalid argument")
+				return True
+		elif command[0] == 1281:
+			param_func = config_params_function.setdefault(command[1],isNotParam)
+			checks = param_func(command[1],command[2])
+			if checks[1] == True:
+				command[2] = checks[0]
+				return True
+			else:
 				return False
 		else:
-			rospy.logwarn("Invalid command id")
+			rospy.logwarn("cmd_id is invalid")
 			return False
 	
 	def initRMPParams(self):

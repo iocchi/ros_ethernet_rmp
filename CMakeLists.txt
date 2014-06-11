@@ -44,7 +44,7 @@ catkin_package(
 
 ## Mark executable scripts (Python etc.) for installation
 install(PROGRAMS
-  scripts/ros_ethernet_rmp.py
+  scripts/ethernet_rmp.py
   scripts/rmp_pose_updater.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
