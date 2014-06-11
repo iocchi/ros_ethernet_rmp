@@ -65,6 +65,10 @@ class PoseUpdate:
 				pitch = (-1 * rmp_values[x]) * math.pi/180
 			elif rmp_items[x] == 'pse_roll_deg':
 				roll = (-1 * rmp_values[x]) * math.pi/180
+			elif rmp_items[x] == 'vel_limit_mps': 
+				v = rmp_values[x]
+		
+		print "value :: ", v
 		
 		"""
 		Segway RMP base tends to drift when stationary, basic 
