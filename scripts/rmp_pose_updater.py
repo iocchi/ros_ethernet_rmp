@@ -95,7 +95,7 @@ class PoseUpdate:
 		odom = Odometry()
 		odom.header.stamp = rospy.Time.now()
 		odom.header.frame_id = "odom"
-		odom.child_frame_id = "base_link"
+		odom.child_frame_id = "base_footprint"
 		odom.pose.pose.position.x = x_pos
 		odom.pose.pose.position.y = y_pos
 		odom.pose.pose.position.z = 0.0
@@ -109,7 +109,7 @@ class PoseUpdate:
 		self.odomPub.publish(odom)
 
 		# publish the transform from odom to the base footprint
-		self.tfBroadCast.sendTransform((x_pos, y_pos, 0.0), quaternion, rospy.Time.now(), '/base_link', '/odom')
+		self.tfBroadCast.sendTransform((x_pos, y_pos, 0.0), quaternion, rospy.Time.now(), '/base_footprint', '/odom')
 
 if __name__ == "__main__":
 	rospy.init_node("rmp_pose_updater")
