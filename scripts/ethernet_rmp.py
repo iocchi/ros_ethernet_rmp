@@ -110,50 +110,27 @@ class RMPExchange:
 			update_delay_sec = 0.01
 
 		self.rmpParams = []
-		#self.rmpParams.append([RMP_CMD_FORCE_CONFIG_FEEDBACK_BITMAPS,1])
-		#self.rmpParams.append([RMP_CMD_SET_MAXIMUM_VELOCITY,rospy.get_param('~my_velocity_limit_mps',DEFAULT_MAXIMUM_VELOCITY_MPS)])
-		#self.rmpParams.append([RMP_CMD_SET_MAXIMUM_ACCELERATION,rospy.get_param('~my_accel_limit_mps2',DEFAULT_MAXIMUM_ACCELERATION_MPS2)])
-		#self.rmpParams.append([RMP_CMD_SET_MAXIMUM_DECELERATION,rospy.get_param('~my_decel_limit_mps2',DEFAULT_MAXIMUM_DECELERATION_MPS2)])
-		#self.rmpParams.append([RMP_CMD_SET_MAXIMUM_DTZ_DECEL_RATE,rospy.get_param('~my_dtz_rate_mps2',DEFAULT_MAXIMUM_DTZ_DECEL_RATE_MPS2)])
-		#self.rmpParams.append([RMP_CMD_SET_COASTDOWN_ACCEL,rospy.get_param('~my_coastdown_accel_mps2',DEFAULT_COASTDOWN_ACCEL_MPS2)])
-		#self.rmpParams.append([RMP_CMD_SET_MAXIMUM_TURN_RATE,rospy.get_param('~my_yaw_rate_limit_rps',DEFAULT_MAXIMUM_YAW_RATE_RPS)])
-		#self.rmpParams.append([RMP_CMD_SET_MAXIMUM_TURN_ACCEL,rospy.get_param('~my_yaw_accel_limit_rps2',DEFAULT_MAX_YAW_ACCEL_RPS2)])
-		#self.rmpParams.append([RMP_CMD_SET_TIRE_DIAMETER,rospy.get_param('~my_tire_diameter_m',DEFAULT_TIRE_DIAMETER_M)])
-		#self.rmpParams.append([RMP_CMD_SET_WHEEL_BASE_LENGTH,rospy.get_param('~my_wheel_base_length_m',DEFAULT_WHEEL_BASE_LENGTH_M)])
-		#self.rmpParams.append([RMP_CMD_SET_WHEEL_TRACK_WIDTH,rospy.get_param('~my_wheel_track_width_m',DEFAULT_WHEEL_TRACK_WIDTH_M)])
-		#self.rmpParams.append([RMP_CMD_SET_TRANSMISSION_RATIO,rospy.get_param('~my_gear_ratio',DEFAULT_TRANSMISSION_RATIO)])
-		#self.rmpParams.append([RMP_CMD_SET_INPUT_CONFIG_BITMAP,rospy.get_param('~my_config_bitmap',DEFAULT_CONFIG_BITMAP)])
-		#self.rmpParams.append([RMP_CMD_SET_ETH_IP_ADDRESS,rospy.get_param('~my_ip_address',DEFAULT_IP_ADDRESS)])
-		#self.rmpParams.append([RMP_CMD_SET_ETH_PORT_NUMBER,rospy.get_param('~my_port_num',DEFAULT_PORT_NUMBER)])
-		#self.rmpParams.append([RMP_CMD_SET_ETH_SUBNET_MASK,rospy.get_param('~my_subnet_mask',DEFAULT_SUBNET_MASK)])
-		#self.rmpParams.append([RMP_CMD_SET_ETH_GATEWAY,rospy.get_param('~my_gateway',DEFAULT_GATEWAY)])
-		#self.rmpParams.append([RMP_CMD_SET_USER_FB_1_BITMAP,rospy.get_param('~my_user_defined_feedback_bitmap_1',DEFAULT_USER_FB_1_BITMAP)])
-		#self.rmpParams.append([RMP_CMD_SET_USER_FB_2_BITMAP,rospy.get_param('~my_user_defined_feedback_bitmap_2',DEFAULT_USER_FB_2_BITMAP)])
-		#self.rmpParams.append([RMP_CMD_SET_USER_FB_3_BITMAP,rospy.get_param('~my_user_defined_feedback_bitmap_3',DEFAULT_USER_FB_3_BITMAP)])
-		#self.rmpParams.append([RMP_CMD_SET_USER_FB_4_BITMAP,rospy.get_param('~my_user_defined_feedback_bitmap_4',DEFAULT_USER_FB_4_BITMAP)])
-		#self.rmpParams.append([RMP_CMD_FORCE_CONFIG_FEEDBACK_BITMAPS,0])	
-
-		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_MAXIMUM_VELOCITY,convert_float_to_u32(rospy.get_param('~my_velocity_limit_mps',DEFAULT_MAXIMUM_VELOCITY_MPS))])
-		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_MAXIMUM_ACCELERATION,convert_float_to_u32(rospy.get_param('~my_accel_limit_mps2',DEFAULT_MAXIMUM_ACCELERATION_MPS2))])
-		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_MAXIMUM_DECELERATION,convert_float_to_u32(rospy.get_param('~my_decel_limit_mps2',DEFAULT_MAXIMUM_DECELERATION_MPS2))])
-		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_MAXIMUM_DTZ_DECEL_RATE,convert_float_to_u32(rospy.get_param('~my_dtz_rate_mps2',DEFAULT_MAXIMUM_DTZ_DECEL_RATE_MPS2))])
-		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_COASTDOWN_ACCEL,convert_float_to_u32(rospy.get_param('~my_coastdown_accel_mps2',DEFAULT_COASTDOWN_ACCEL_MPS2))])
-		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_MAXIMUM_TURN_RATE,convert_float_to_u32(rospy.get_param('~my_yaw_rate_limit_rps',DEFAULT_MAXIMUM_YAW_RATE_RPS))])
-		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_MAXIMUM_TURN_ACCEL,convert_float_to_u32(rospy.get_param('~my_yaw_accel_limit_rps2',DEFAULT_MAX_YAW_ACCEL_RPS2))])
-		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_TIRE_DIAMETER,convert_float_to_u32(rospy.get_param('~my_tire_diameter_m',DEFAULT_TIRE_DIAMETER_M))])
-		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_WHEEL_BASE_LENGTH,convert_float_to_u32(rospy.get_param('~my_wheel_base_length_m',DEFAULT_WHEEL_BASE_LENGTH_M))])
-		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_WHEEL_TRACK_WIDTH,convert_float_to_u32(rospy.get_param('~my_wheel_track_width_m',DEFAULT_WHEEL_TRACK_WIDTH_M))])
-		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_TRANSMISSION_RATIO,convert_float_to_u32(rospy.get_param('~my_gear_ratio',DEFAULT_TRANSMISSION_RATIO))])
+		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_MAXIMUM_VELOCITY,rospy.get_param('~my_velocity_limit_mps',DEFAULT_MAXIMUM_VELOCITY_MPS)])
+		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_MAXIMUM_ACCELERATION,rospy.get_param('~my_accel_limit_mps2',DEFAULT_MAXIMUM_ACCELERATION_MPS2)])
+		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_MAXIMUM_DECELERATION,rospy.get_param('~my_decel_limit_mps2',DEFAULT_MAXIMUM_DECELERATION_MPS2)])
+		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_MAXIMUM_DTZ_DECEL_RATE,rospy.get_param('~my_dtz_rate_mps2',DEFAULT_MAXIMUM_DTZ_DECEL_RATE_MPS2)])
+		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_COASTDOWN_ACCEL,rospy.get_param('~my_coastdown_accel_mps2',DEFAULT_COASTDOWN_ACCEL_MPS2)])
+		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_MAXIMUM_TURN_RATE,rospy.get_param('~my_yaw_rate_limit_rps',DEFAULT_MAXIMUM_YAW_RATE_RPS)])
+		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_MAXIMUM_TURN_ACCEL,rospy.get_param('~my_yaw_accel_limit_rps2',DEFAULT_MAX_YAW_ACCEL_RPS2)])
+		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_TIRE_DIAMETER,rospy.get_param('~my_tire_diameter_m',DEFAULT_TIRE_DIAMETER_M)])
+		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_WHEEL_BASE_LENGTH,rospy.get_param('~my_wheel_base_length_m',DEFAULT_WHEEL_BASE_LENGTH_M)])
+		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_WHEEL_TRACK_WIDTH,rospy.get_param('~my_wheel_track_width_m',DEFAULT_WHEEL_TRACK_WIDTH_M)])
+		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_TRANSMISSION_RATIO,rospy.get_param('~my_gear_ratio',DEFAULT_TRANSMISSION_RATIO)])
 		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_INPUT_CONFIG_BITMAP,rospy.get_param('~my_config_bitmap',DEFAULT_CONFIG_BITMAP)])
-		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_ETH_IP_ADDRESS,dottedQuadToNum(rospy.get_param('~my_ip_address',DEFAULT_IP_ADDRESS))])
+		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_ETH_IP_ADDRESS,rospy.get_param('~my_ip_address',DEFAULT_IP_ADDRESS)])
 		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_ETH_PORT_NUMBER,rospy.get_param('~my_port_num',DEFAULT_PORT_NUMBER)])
-		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_ETH_SUBNET_MASK,dottedQuadToNum(rospy.get_param('~my_subnet_mask',DEFAULT_SUBNET_MASK))])
-		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_ETH_GATEWAY,dottedQuadToNum(rospy.get_param('~my_gateway',DEFAULT_GATEWAY))])
+		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_ETH_SUBNET_MASK,rospy.get_param('~my_subnet_mask',DEFAULT_SUBNET_MASK)])
+		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_ETH_GATEWAY,rospy.get_param('~my_gateway',DEFAULT_GATEWAY)])
 		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_USER_FB_1_BITMAP,rospy.get_param('~my_user_defined_feedback_bitmap_1',DEFAULT_USER_FB_1_BITMAP)])
 		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_USER_FB_2_BITMAP,rospy.get_param('~my_user_defined_feedback_bitmap_2',DEFAULT_USER_FB_2_BITMAP)])
 		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_USER_FB_3_BITMAP,rospy.get_param('~my_user_defined_feedback_bitmap_3',DEFAULT_USER_FB_3_BITMAP)])
-		
-		
+		self.rmpParams.append([RMP_CFG_CMD_ID,RMP_CMD_SET_USER_FB_4_BITMAP,rospy.get_param('~my_user_defined_feedback_bitmap_4',DEFAULT_USER_FB_4_BITMAP)])
+				
 		"""
 		Create and response and command queue. The responses will be in the form of 
 		a dictionary containing the vaiable name as the key and a converted value
@@ -294,15 +271,10 @@ class RMPExchange:
 			return [False,command]
 	
 	def initRMPParams(self):
-		for param in self.rmpParams:
-			#command = [RMP_CFG_CMD_ID, param[0], param[1]]
-			self.EventHandler.AddCommand(param)
-			"""
+		for command in self.rmpParams:
 			check = self.isValidCommand(command)
 			if check[0] == True:
-				print "Setting %s, to %s" % (config_params_names[command[1]],command[2])
 				self.EventHandler.AddCommand(check[1])
-				"""
 	
 	def rmp_send_recv(self):
 		"""
