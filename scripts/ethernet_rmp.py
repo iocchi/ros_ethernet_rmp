@@ -259,7 +259,7 @@ class RMPExchange:
 			else:
 				return [True,command]
 		elif command[0] == 1281:
-			param_func = config_params_function.setdefault(command[1],isNotParam)
+			param_func = config_params_function.setdefault(command[1],is_not_param)
 			checks = param_func(command[1],command[2])
 			if checks[1] == True:
 				command[2] = checks[0]
