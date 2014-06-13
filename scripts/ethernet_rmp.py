@@ -198,11 +198,11 @@ class RMPExchange:
 				
 	def sendMotionCommand(self,command):
 		if not self.isOmni:
-			self.EventHandler.AddCommand([RMP_MOTION_CMD_ID,command.linear.x,command.angular.z])
+			self.EventHandler.AddCommand([RMP_MOTION_CMD_ID,command.linear.x,-command.angular.z])
 		else:
 			forw_vel = math.sqrt(command.linear.x**2 + command.linear.y**2)/math.sqrt(2)
 			angle = math.atan2(command.linear.y, command.linear.x) + math.pi
-			self.EventHandler.AddCommand([RMP_OMNI_MOTION_CMD_ID,forw_vel,command.angular.z, angle])
+			self.EventHandler.AddCommand([RMP_OMNI_MOTION_CMD_ID,forw_vel,-command.angular.z, angle])
 	
 	def sendRMPCommand(self,command):
 		if command.cmd_id == 1280 or command.cmd_id == 1281: 
