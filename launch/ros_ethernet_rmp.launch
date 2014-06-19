@@ -30,6 +30,7 @@
   <arg name="user_defined_feedback_bitmap_2" value="4294967295" />
   <arg name="user_defined_feedback_bitmap_3" value="4294967295" />
   <arg name="user_defined_feedback_bitmap_4" value="0" />
+  <arg name="publish_tf" value="true" />
 
   <node pkg="ros_ethernet_rmp" type="ethernet_rmp.py" name="ethernet_rmp" output="screen">
     <param name="update_delay_sec" type="double" value="$(arg update_delay_sec)" />
@@ -59,5 +60,7 @@
     <param name="my_user_defined_feedback_bitmap_4" type="double" value="$(arg user_defined_feedback_bitmap_4)" />
   </node>
 
-  <node pkg="ros_ethernet_rmp" type="rmp_pose_updater.py" name="rmp_pose_updater" output="screen" />
+  <node pkg="ros_ethernet_rmp" type="rmp_pose_updater.py" name="rmp_pose_updater" output="screen" >
+    <param name="publish_tf" type="bool" value="$(arg publish_tf)" />
+  </node>
 </launch>
