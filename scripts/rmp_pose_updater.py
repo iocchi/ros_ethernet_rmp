@@ -36,6 +36,7 @@ class PoseUpdate:
 		self.odomPub = rospy.Publisher('odom', Odometry, queue_size = 'None')
 		self.tfBroadCast = tf.TransformBroadcaster()
 		rospy.Subscriber("rmp_feedback", RMPFeedback, self.pose_update)
+		self.publish_tf = rospy.get_param('~publish_tf',True)
 		
 	def pose_update(self, rmp):
 		"""
@@ -109,7 +110,8 @@ class PoseUpdate:
 		self.odomPub.publish(odom)
 
 		# publish the transform from odom to the base footprint
-		self.tfBroadCast.sendTransform((x_pos, y_pos, 0.0), quaternion, rospy.Time.now(), '/base_footprint', '/odom')
+		if self.publish_tf:
+			self.tfBroadCast.sendTransform((x_pos, y_pos, 0.0), quaternion, rospy.Time.now(), '/base_footprint', '/odom')
 
 if __name__ == "__main__":
 	rospy.init_node("rmp_pose_updater")
