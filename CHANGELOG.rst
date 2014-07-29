@@ -2,6 +2,13 @@
 Changelog for package ros_ethernet_rmp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.2 (2014-07-29)
+------------------
+* Merge pull request #10 from cmdunkers/develop
+  fixed the yaw rates for carl
+* fixed the yaw rates for carl
+* Contributors: Chris Dunkers, Russell Toris
+
 0.0.1 (2014-07-23)
 ------------------
 * Merge pull request `#9 <https://github.com/WPI-RAIL/ros_ethernet_rmp/issues/9>`_ from cmdunkers/develop
