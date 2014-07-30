@@ -2,6 +2,15 @@
 Changelog for package ros_ethernet_rmp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.3 (2014-07-30)
+------------------
+* Merge pull request #11 from cmdunkers/develop
+  added in joint state publisher from the segway feedback for the wheels
+* added the correct joint lint names
+* fixed package name
+* added a joint state publisher for the wheels based ont he feedback
+* Contributors: Chris Dunkers, Russell Toris
+
 0.0.2 (2014-07-29)
 ------------------
 * Merge pull request #10 from cmdunkers/develop
