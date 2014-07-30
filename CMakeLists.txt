@@ -8,7 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   rospy
   std_msgs
-  sensor_messages
+  sensor_msgs
 )
 
 ################################################
