@@ -16,7 +16,7 @@ import math
 import time
 import os
 
-class BatteryMonitor:
+class JointStateMonitor:
 
 	def __init__(self):
 		"""
@@ -30,10 +30,10 @@ class BatteryMonitor:
 		Get the battery parameters
 		"""
 		self.has_two_wheels = rospy.get_param('~front_base_batt_1',True)
-		self.link_left_front = rospy.get_param('~link_left_front','link_left_front')
-		self.link_right_front = rospy.get_param('~link_right_front','link_right_front')
-		self.link_left_rear = rospy.get_param('~link_left_rear','link_left_rear')
-		self.link_right_rear = rospy.get_param('~link_right_rear','link_right_rear')
+		self.link_left_front = rospy.get_param('~link_left_front','base_link_left_wheel_joint')
+		self.link_right_front = rospy.get_param('~link_right_front','base_link_right_wheel_joint')
+		self.link_left_rear = rospy.get_param('~link_left_rear','base_link_leftr_wheel_joint')
+		self.link_right_rear = rospy.get_param('~link_right_rear','base_link_rightr_wheel_joint')
 		
 	def get_batt_state(self, rmp):
 		"""
@@ -57,38 +57,38 @@ class BatteryMonitor:
 			if rmp_items[x] == 'left_front_pos_m':
 				pos[0] = rmp_values[x]
 			elif rmp_items[x] == 'right_front_pos_m':
-				pos[2] = rmp_values[x]
+				pos[1] = rmp_values[x]
 			elif rmp_items[x] == 'left_rear_pos_m':
-				pos[3] = rmp_values[x]
+				pos[2] = rmp_values[x]
 			elif rmp_items[x] == 'right_rear_pos_m':
-				pos[4] = rmp_values[x]
+				pos[3] = rmp_values[x]
 			elif rmp_items[x] == 'left_front_vel_mps':
-				vel[1] = rmp_values[x]
+				vel[0] = rmp_values[x]
 			elif rmp_items[x] == 'right_front_vel_mps':
-				vel[2] = rmp_values[x]
+				vel[1] = rmp_values[x]
 			elif rmp_items[x] == 'left_rear_vel_mps':
-				vel[3] = rmp_values[x]
+				vel[2] = rmp_values[x]
 			elif rmp_items[x] == 'right_rear_vel_mps':
-				vel[4] = rmp_values[x]
+				vel[3] = rmp_values[x]
 				
-		if self.has_two_wheel:
+		if self.has_two_wheels:
 			num = 2
 		else:
 			num = 4
 			
-		for x in range(1,num):
-			joint_state.names.append(names[x])
+		for x in range(0,num):
+			joint_state.name.append(names[x])
 			joint_state.position.append(pos[x])
 			joint_state.velocity.append(vel[x])
 			
 		"""
-		Publish the state of charges of the batteries present
+		Publish the state of the wheels/joints
 		"""	
 		joint_state.header.stamp = rospy.Time.now()
 		self.jointStatePub.publish(joint_state)
 
 if __name__ == "__main__":
 	rospy.init_node("rmp_joint_state")
-	battMonitor = BatteryMonitor()
+	jointState = JointStateMonitor()
 	rospy.loginfo("RMP Joint State Started")
 	rospy.spin()
