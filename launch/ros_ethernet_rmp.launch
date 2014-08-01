@@ -30,7 +30,6 @@
   <arg name="user_defined_feedback_bitmap_2" value="4294967295" />
   <arg name="user_defined_feedback_bitmap_3" value="4294967295" />
   <arg name="user_defined_feedback_bitmap_4" value="0" />
-  <arg name="publish_tf" value="true" />
 
   <node pkg="ros_ethernet_rmp" type="ethernet_rmp.py" name="ethernet_rmp" output="screen">
     <param name="update_delay_sec" type="double" value="$(arg update_delay_sec)" />
@@ -60,7 +59,26 @@
     <param name="my_user_defined_feedback_bitmap_4" type="double" value="$(arg user_defined_feedback_bitmap_4)" />
   </node>
 
+  <arg name="publish_tf" value="true" />
   <node pkg="ros_ethernet_rmp" type="rmp_pose_updater.py" name="rmp_pose_updater" output="screen" >
     <param name="publish_tf" type="bool" value="$(arg publish_tf)" />
   </node>
+
+  <arg name="has_two_wheels" value="true" />
+  <arg name="link_left_front" value="base_link_left_wheel_joint" />
+  <arg name="link_right_front" value="base_link_right_wheel_joint" />
+  <arg name="link_left_rear" value="base_link_left_rear_wheel_joint" />
+  <arg name="link_right_rear" value="base_link_right_rear_wheel_joint" />
+  <node pkg="ros_ethernet_rmp" type="rmp_joint_state.py" name="rmp_joint_state" output="screen" >
+    <param name="has_two_wheels" type="bool" value="$(arg has_two_wheels)" />
+    <param name="link_left_front" type="string" value="$(arg link_left_front)" />
+    <param name="link_right_front" type="string" value="$(arg link_right_front)" />
+    <param name="link_left_rear" type="string" value="$(arg link_left_rear)" />
+    <param name="link_right_rear" type="string" value="$(arg link_right_rear)" />
+  </node>
+  
+  <arg name="include_batt_monitor" value="true"/>
+  <group if="$(arg include_batt_monitor)">
+    <include file="$(find carl_bringup)/launch/segway.launch"/>
+  </group>
 </launch>

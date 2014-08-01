@@ -28,4 +28,5 @@
   <run_depend>nav_msgs</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>tf</run_depend>
+  <run_depend>battery_monitor_rmp</run_depend>
 </package>
