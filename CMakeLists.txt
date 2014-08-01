@@ -47,7 +47,7 @@ catkin_package(
 install(PROGRAMS
   scripts/ethernet_rmp.py
   scripts/rmp_pose_updater.py
-  scripts/rmp_joint_states.py
+  scripts/rmp_joint_state.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
