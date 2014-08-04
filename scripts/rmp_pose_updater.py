@@ -17,7 +17,6 @@ import rospy
 import math
 import time
 
-
 class PoseUpdate:
 	"""
 	Pose updater for the Segway RMP platform.
