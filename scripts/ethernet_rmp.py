@@ -55,7 +55,7 @@ Author:  Russell Toris, Worcester Polytechnic Institute
 Version: June 10, 2014
 """
 
-from ros_ethernet_rmp.msg import RMPCommand, RMPFeedback
+from rmp_msgs.msg import RMPCommand, RMPFeedback
 from python_ethernet_rmp.rmp_interface import RMP
 from python_ethernet_rmp.system_defines import *
 from python_ethernet_rmp.user_event_handlers import RMPEventHandlers
