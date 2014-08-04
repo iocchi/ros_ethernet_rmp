@@ -24,6 +24,7 @@ install(PROGRAMS
   scripts/ethernet_rmp.py
   scripts/rmp_pose_updater.py
   scripts/rmp_joint_state.py
+  scripts/rmp_config_limits.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
