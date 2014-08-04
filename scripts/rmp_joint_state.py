@@ -7,7 +7,6 @@ Author:  Chris Dunkers, Worcester Polytechnic Institute
 Version: June 23, 2014
 """
 from rmp_msgs.msg import RMPFeedback
-from battery_monitor_rmp.msg import RMPBatteryStatus 
 from python_ethernet_rmp.system_defines import *
 from std_msgs.msg import String
 from sensor_msgs.msg import JointState
