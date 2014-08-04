@@ -7,7 +7,7 @@ Author:  Chris Dunkers, Worcester Polytechnic Institute
 Author:  Russell Toris, Worcester Polytechnic Institute
 Version: June 10, 2014
 """
-from ros_ethernet_rmp.msg import RMPFeedback
+from rmp_msgs.msg import RMPFeedback
 from tf.msg import *
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseWithCovarianceStamped, Quaternion
