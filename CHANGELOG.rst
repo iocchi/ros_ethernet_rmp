@@ -2,6 +2,31 @@
 Changelog for package ros_ethernet_rmp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.4 (2014-08-05)
+------------------
+* fixed looking for wrong packages
+* travis now pull messages from source
+* moved messages to rmp_msgs
+* Merge pull request #16 from cmdunkers/develop
+  changed to rmp_msgs
+* changed to rmp_msgs
+* Battery monitor added to travis
+* fixed CMakeLists bug
+* Merge pull request #15 from cmdunkers/develop
+  direction!
+* direction!
+* Merge pull request #14 from cmdunkers/develop
+  radians!
+* radians!
+* missing thing
+* launch file fix
+* Merge pull request #12 from cmdunkers/develop
+  Fixed issues with the wheel joint state
+* fixed the modulo
+* Fixed issues with the wheel joint state
+  added the battery monitor to the launch file
+* Contributors: Chris Dunkers, David Kent, Russell Toris, dekent
+
 0.0.3 (2014-07-30)
 ------------------
 * Merge pull request #11 from cmdunkers/develop
