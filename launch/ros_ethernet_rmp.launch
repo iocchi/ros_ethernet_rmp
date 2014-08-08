@@ -16,7 +16,7 @@
   <arg name="dtz_rate" value="0.981" />
   <arg name="coastdown_accel" value="0.1962" />
   <arg name="yaw_rate_limit" value="1.7" />
-  <arg name="yaw_accel_limit" value="10.0" />
+  <arg name="yaw_accel_limit" value="5.0" />
   <arg name="tire_diameter" value="0.46228" />
   <arg name="wheel_base_length" value="0.5842" />
   <arg name="wheel_track_width" value="0.569976" />
