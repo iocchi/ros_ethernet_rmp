@@ -12,7 +12,6 @@ from python_ethernet_rmp.utils import *
 import rospy
 import sys
 
-
 def is_range_set(arg1, arg2):
 	"""
 	Function to check the range of the parameter value. If out of range the parameter is set as the boundary.
