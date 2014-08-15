@@ -2,6 +2,19 @@
 Changelog for package ros_ethernet_rmp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.5 (2014-08-15)
+------------------
+* Merge pull request #17 from cmdunkers/develop
+  updated yaw accel limit
+* updated the yaw_accel_limit
+* Merge branch 'develop' of https://github.com/cmdunkers/ros_ethernet_rmp into develop
+* Merge pull request #2 from WPI-RAIL/develop
+  cmdunkers
+* Merge pull request #1 from WPI-RAIL/develop
+  updates
+* fixed joint state publisher issue
+* Contributors: Chris Dunkers, Russell Toris, cmdunkers
+
 0.0.4 (2014-08-05)
 ------------------
 * fixed looking for wrong packages
