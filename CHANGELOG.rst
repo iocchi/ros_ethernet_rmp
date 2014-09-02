@@ -2,6 +2,11 @@
 Changelog for package ros_ethernet_rmp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.6 (2014-09-02)
+------------------
+* fixed wheel direction for joint state publisher to work correctly with the fixed urdf
+* Contributors: dekent
+
 0.0.5 (2014-08-15)
 ------------------
 * Merge pull request #17 from cmdunkers/develop
