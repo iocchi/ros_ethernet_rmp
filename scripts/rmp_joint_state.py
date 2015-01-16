@@ -29,12 +29,15 @@ class JointStateMonitor:
 		Get the battery parameters
 		"""
 		self.has_two_wheels = rospy.get_param('~has_two_wheels',True)
+		self.has_caster_wheel = rospy.get_param('~has_caster_wheel',True)
 		self.link_left_front = rospy.get_param('~link_left_front','base_link_left_wheel_joint')
 		self.link_right_front = rospy.get_param('~link_right_front','base_link_right_wheel_joint')
 		self.link_left_rear = rospy.get_param('~link_left_rear','base_link_left_rear_wheel_joint')
 		self.link_right_rear = rospy.get_param('~link_right_rear','base_link_right_rear_wheel_joint')
+		self.link_caster = rospy.get_param('~link_caster','caster_plate_link_caster_link_joint')
 		tire_diameter = rospy.get_param('/ethernet_rmp/my_tire_diameter',DEFAULT_TIRE_DIAMETER_M)
 		self.circumference = math.pi*tire_diameter;
+		self.prev_caster_pos = 0
 		
 	def get_batt_state(self, rmp):
 		"""
@@ -47,9 +50,9 @@ class JointStateMonitor:
 		joint_state = JointState()
 		
 		names = [self.link_left_front, self.link_right_front,
-					self.link_left_rear, self.link_right_rear]
-		pos = [0,0,0,0]
-		vel = [0,0,0,0]
+					self.link_left_rear, self.link_right_rear, self.link_caster]
+		pos = [0,0,0,0,0]
+		vel = [0,0,0,0,0]
 		
 		"""
 		get the values for the feedback items needed
@@ -81,10 +84,53 @@ class JointStateMonitor:
 			joint_state.name.append(names[x])
 			joint_state.position.append(pos[x])
 			joint_state.velocity.append(vel[x])
-			
+		
+		"""
+		calculate (very rough) caster wheel position
+		"""
+		if self.has_caster_wheel:
+			left_vel = -vel[0]
+			right_vel = vel[1]
+			if abs(left_vel) < 0.01:
+				left_vel = 0
+			if abs(right_vel) < 0.01:
+				right_vel = 0
+			if left_vel != 0 or right_vel != 0:
+				step = .04
+				target = math.atan2(right_vel, left_vel) - math.pi/4
+				if target > math.pi:
+					target -= 2*math.pi
+				if target < -math.pi:
+					target += 2*math.pi
+				pos[4] = self.prev_caster_pos
+				#calculate direction to turn
+				if abs(pos[4] - target) >= step:
+					direction = 1
+					if pos[4] > target:
+						if abs(target - pos[4]) < (2*math.pi + target - pos[4]):
+							direction = -1
+					else:
+						if (2*math.pi - (pos[4] - target)) < (pos[4] - target):
+							direction = -1
+					#turn to target
+                       		 	pos[4] += direction*step
+					while pos[4] <= -math.pi:
+						pos[4] += 2*math.pi
+					while pos[4] > math.pi:
+						pos[4] -= 2*math.pi
+				else:
+					pos[4] = target
+				self.prev_caster_pos = pos[4]
+			else:
+				pos[4] = self.prev_caster_pos
+
+		joint_state.name.append(names[4])
+		joint_state.position.append(pos[4])
+		joint_state.velocity.append(vel[4])
+		
 		"""
 		Publish the state of the wheels/joints
-		"""	
+		"""
 		joint_state.header.stamp = rospy.Time.now()
 		self.jointStatePub.publish(joint_state)
 
