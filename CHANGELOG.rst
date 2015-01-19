@@ -2,6 +2,11 @@
 Changelog for package ros_ethernet_rmp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.7 (2015-01-19)
+------------------
+* Added approximation of caster wheel orientaiton
+* Contributors: David Kent
+
 0.0.6 (2014-09-02)
 ------------------
 * fixed wheel direction for joint state publisher to work correctly with the fixed urdf
