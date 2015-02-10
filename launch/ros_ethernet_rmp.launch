@@ -5,31 +5,31 @@
 -->
 
 <launch>
-  <arg name="update_delay_sec" value="0.02" />
-  <arg name="log_data" value="false" />
-  <arg name="cur_rmp_ip_addr" value="192.168.0.40" />
-  <arg name="cur_rmp_port_num" value="8080" />
-  <arg name="is_omni" value="false" />
-  <arg name="velocity_limit" value="1.0" />
-  <arg name="accel_limit" value="0.981" />
-  <arg name="decel_limit" value="0.981" />
-  <arg name="dtz_rate" value="0.981" />
-  <arg name="coastdown_accel" value="0.1962" />
-  <arg name="yaw_rate_limit" value="1.7" />
-  <arg name="yaw_accel_limit" value="5.0" />
-  <arg name="tire_diameter" value="0.46228" />
-  <arg name="wheel_base_length" value="0.5842" />
-  <arg name="wheel_track_width" value="0.569976" />
-  <arg name="gear_ratio" value="24.2667" />
-  <arg name="config_bitmap" value="1" />
-  <arg name="ip_address" value="192.168.0.40" />
-  <arg name="port_num" value="8080" />
-  <arg name="subnet_mask" value="192.168.0.1" />
-  <arg name="gateway" value="255.255.255.0" />
-  <arg name="user_defined_feedback_bitmap_1" value="4294967295" />
-  <arg name="user_defined_feedback_bitmap_2" value="4294967295" />
-  <arg name="user_defined_feedback_bitmap_3" value="4294967295" />
-  <arg name="user_defined_feedback_bitmap_4" value="0" />
+  <arg name="update_delay_sec" default="0.02" />
+  <arg name="log_data" default="false" />
+  <arg name="cur_rmp_ip_addr" default="192.168.0.40" />
+  <arg name="cur_rmp_port_num" default="8080" />
+  <arg name="is_omni" default="false" />
+  <arg name="velocity_limit" default="1.0" />
+  <arg name="accel_limit" default="0.981" />
+  <arg name="decel_limit" default="0.981" />
+  <arg name="dtz_rate" default="0.981" />
+  <arg name="coastdown_accel" default="0.1962" />
+  <arg name="yaw_rate_limit" default="1.7" />
+  <arg name="yaw_accel_limit" default="5.0" />
+  <arg name="tire_diameter" default="0.46228" />
+  <arg name="wheel_base_length" default="0.5842" />
+  <arg name="wheel_track_width" default="0.569976" />
+  <arg name="gear_ratio" default="24.2667" />
+  <arg name="config_bitmap" default="1" />
+  <arg name="ip_address" default="192.168.0.40" />
+  <arg name="port_num" default="8080" />
+  <arg name="subnet_mask" default="192.168.0.1" />
+  <arg name="gateway" default="255.255.255.0" />
+  <arg name="user_defined_feedback_bitmap_1" default="4294967295" />
+  <arg name="user_defined_feedback_bitmap_2" default="4294967295" />
+  <arg name="user_defined_feedback_bitmap_3" default="4294967295" />
+  <arg name="user_defined_feedback_bitmap_4" default="0" />
 
   <node pkg="ros_ethernet_rmp" type="ethernet_rmp.py" name="ethernet_rmp" output="screen">
     <param name="update_delay_sec" type="double" value="$(arg update_delay_sec)" />
