@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>ros_ethernet_rmp</name>
-  <version>0.0.7</version>
+  <version>0.0.8</version>
   <description>ROS Wrapper for the Segway RMP Ethernet Python Driver</description>
 
   <maintainer email="rctoris@wpi.edu">Russell Toris</maintainer>
