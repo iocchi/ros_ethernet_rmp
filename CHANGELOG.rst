@@ -2,6 +2,11 @@
 Changelog for package ros_ethernet_rmp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.8 (2015-02-10)
+------------------
+* Changed args in launch file so that they can be overriden
+* Contributors: David Kent
+
 0.0.7 (2015-01-19)
 ------------------
 * Added approximation of caster wheel orientaiton
