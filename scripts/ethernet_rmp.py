@@ -278,12 +278,19 @@ class RMPExchange:
 	
 	def rmp_send_recv(self):
 		"""
-		Main loop to continually empty yhe out_flags queue
+		Main loop to continually empty the out_flags queue
 		"""
+
+	    # loop rate (TODO: make it parametrics)
+        rate=25
+        r = rospy.Rate(rate)
+
 		while not rospy.is_shutdown() and self.EventHandler._continue:
 			while not self.out_flags.empty() and self.EventHandler._continue:
 				self.EventHandler.handle_event[self.out_flags.get()]()
-			
+            r.sleep()
+
+
 if __name__ == "__main__":
 	rospy.init_node('ros_ethernet_rmp')
 	rmp_command = RMPExchange()
