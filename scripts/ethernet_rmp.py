@@ -281,14 +281,14 @@ class RMPExchange:
 		Main loop to continually empty the out_flags queue
 		"""
 
-	    # loop rate (TODO: make it parametrics)
-        rate=25
-        r = rospy.Rate(rate)
+		# loop rate (TODO: make it parametrics)
+		rate=25
+		r = rospy.Rate(rate)
 
 		while not rospy.is_shutdown() and self.EventHandler._continue:
 			while not self.out_flags.empty() and self.EventHandler._continue:
 				self.EventHandler.handle_event[self.out_flags.get()]()
-            r.sleep()
+			r.sleep()
 
 
 if __name__ == "__main__":
