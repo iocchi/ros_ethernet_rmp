@@ -158,10 +158,10 @@ class RMPExchange:
 		Initialize the feedback publisher
 		"""
 		self.rmpFeedback = RMPFeedback()
-		self.feedbackPub = rospy.Publisher('rmp_feedback', RMPFeedback, queue_size = 'None')
+		self.feedbackPub = rospy.Publisher('rmp_feedback', RMPFeedback, queue_size = 1)
 
-		rospy.Subscriber("rmp_command", RMPCommand, self.sendRMPCommand)
-		rospy.Subscriber("cmd_vel", Twist, self.sendMotionCommand)
+		rospy.Subscriber("rmp_command", RMPCommand, self.sendRMPCommand, queue_size = 1)
+		rospy.Subscriber("cmd_vel", Twist, self.sendMotionCommand, queue_size = None)
 
 		"""
 		Add a Feedback listener to the segway driver
@@ -282,7 +282,7 @@ class RMPExchange:
 		"""
 
 		# loop rate (TODO: make it parametrics)
-		rate=25
+		rate=100
 		r = rospy.Rate(rate)
 
 		while not rospy.is_shutdown() and self.EventHandler._continue:
